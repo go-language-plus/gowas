@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -20,8 +19,8 @@ import (
 var (
 	flagListen = flag.String("listen", ":5000", "HTTP listen address")
 	flagDir    = flag.String("dir", ".", "directory to serve")
-	flagTags   = flag.String("tags", "", "go build tags")
 	flagRouter = flag.String("router", "", "router modules; if use router in wasm framework (like vecty-router), set it to 'on' ")
+	flagTags   = flag.String("tags", "", "go build tags")
 )
 
 var staticOutputDir = "static/"
@@ -83,7 +82,6 @@ func serveStatic(w http.ResponseWriter, r *http.Request) {
 	if *flagRouter == "on" {
 		serveIndex(w, r)
 	} else {
-		fmt.Println(filepath.Join(".", r.URL.Path))
 		http.ServeFile(w, r, filepath.Join(".", r.URL.Path))
 	}
 }

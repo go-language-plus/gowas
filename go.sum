@@ -1,4 +1,6 @@
 github.com/go-language-plus/pkg v0.1.2 h1:kLY2XpjEhd6hVIPq6Zq4KZB0x/o5lTY/+myxTeDkDh8=
 github.com/go-language-plus/pkg v0.1.2/go.mod h1:Dl/vNT27CSDwBl91DGHH5fdNMgz3TvhUr1ljSlD1uUY=
+github.com/hajimehoshi/wasmserve v0.0.0-20200921065616-c95bb0de031e h1:NrmopPQTXcpEsajEa9E8cQTKUEBgWZ1cF0FmFM3Vfcg=
+github.com/hajimehoshi/wasmserve v0.0.0-20200921065616-c95bb0de031e/go.mod h1:DI8IeyYdAkNS/K9JvLFBab7cmOkvoLCvMS9U8hLP2tw=
 github.com/julienschmidt/httprouter v1.3.0 h1:U0609e9tgbseu3rBINet9P48AI/D3oJs4dN7jwJOQ1U=
 github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=

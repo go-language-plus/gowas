@@ -2,7 +2,9 @@
 
 ![Go](https://github.com/go-language-plus/gowas/workflows/Go/badge.svg?branch=main)
 
-Gowas（go-webassembly-serve）Is a Wasm development tool that provides http service support.
+Gowas（go-webassembly-serve）Is a webassembly development tool that provides http service support.
+
+- Auto run go build main.wasm
 
 ## Install
 ```bash
