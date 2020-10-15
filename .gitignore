@@ -13,3 +13,13 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Goland setting
+.idea/
+
+# static path
+static/
+test/static/
+
+gowas
+gowas.exe
