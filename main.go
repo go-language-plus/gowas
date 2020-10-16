@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/go-language-plus/gowas/config"
 	"github.com/go-language-plus/pkg/stringp"
-	"github.com/julienschmidt/httprouter"
 )
 
 var (
@@ -32,31 +32,29 @@ func main() {
 
 func serveHTTP() {
 	log.Printf("start listening http request on %q", *flagListen)
-
-	router := httprouter.New()
-	router.GET("/", handlerIndex)
-	router.NotFound = http.HandlerFunc(handleNotFound)
-
-	log.Fatal(http.ListenAndServe(*flagListen, router))
+	http.HandleFunc("/", handler)
+	log.Fatal(http.ListenAndServe(*flagListen, nil))
 }
 
-func handlerIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	serveStatic(w, r)
-}
+func handler(w http.ResponseWriter, r *http.Request) {
+	url := r.URL.Path[1:]
+	filePath := filepath.Join(".", filepath.Base(url))
 
-func handleNotFound(w http.ResponseWriter, r *http.Request) {
-	if strings.HasSuffix(r.URL.Path, "/") {
-		http.Redirect(w, r, r.URL.Path[:len(r.URL.Path)-1], http.StatusSeeOther)
-		return
+	if !strings.HasSuffix(r.URL.Path, "/") {
+		fi, err := os.Stat(filePath)
+		if err != nil && !os.IsNotExist(err) {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if fi != nil && fi.IsDir() {
+			http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
+			return
+		}
 	}
 
-	serveStatic(w, r)
-}
-
-func serveStatic(w http.ResponseWriter, r *http.Request) {
-
 	switch filepath.Base(r.URL.Path) {
-	case "index.html", ".":
+	case "index.html":
+		fmt.Println(r.URL.Path + "inside")
 		serveIndex(w, r)
 		return
 	case "main.wasm":
