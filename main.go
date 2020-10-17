@@ -3,13 +3,11 @@ package main
 import (
 	"bytes"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/go-language-plus/gowas/config"
@@ -37,24 +35,10 @@ func serveHTTP() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	url := r.URL.Path[1:]
-	filePath := filepath.Join(".", filepath.Base(url))
-
-	if !strings.HasSuffix(r.URL.Path, "/") {
-		fi, err := os.Stat(filePath)
-		if err != nil && !os.IsNotExist(err) {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if fi != nil && fi.IsDir() {
-			http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
-			return
-		}
-	}
-
-	switch filepath.Base(r.URL.Path) {
+	dir, file := filepath.Split(r.URL.Path)
+	// special path
+	switch file {
 	case "index.html":
-		fmt.Println(r.URL.Path + "inside")
 		serveIndex(w, r)
 		return
 	case "main.wasm":
@@ -75,18 +59,46 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		f := filepath.Join(runtime.GOROOT(), "misc", "wasm", "wasm_exec.js")
 		http.ServeFile(w, r, f)
 		return
-	}
+	case "":
+		// file is empty, check dir
+		if dir == "/" {
+			serveIndex(w, r)
+			return
+		}
 
-	if *flagRouter == "on" {
-		serveIndex(w, r)
-	} else {
-		http.ServeFile(w, r, filepath.Join(".", r.URL.Path))
+		// TODO check this
+		http.ServeFile(w, r, filepath.Join(".", filepath.Join(".", r.URL.Path[1:])))
+	default:
+		// other file names
+		// check file exist
+		filePath := filepath.Join(".", r.URL.Path[1:])
+		fi, err := os.Stat(filePath)
+		if err != nil && !os.IsNotExist(err) {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// if filepath not exist
+		if os.IsNotExist(err) && *flagRouter == "on" {
+			serveIndex(w, r)
+			return
+		}
+
+		// if filepath exist
+		// it is dir
+		if fi != nil && fi.IsDir() {
+			http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
+			return
+		}
+		// it is a file or default
+		http.ServeFile(w, r, filepath.Join(".", filePath))
+		return
 	}
 }
 
 func serveIndex(w http.ResponseWriter, r *http.Request) {
 	indexExist, err := checkDirExists("static/index.html")
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
