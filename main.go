@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/go-language-plus/gowas/config"
-	"github.com/go-language-plus/pkg/stringp"
+	"github.com/go-language-plus/pkg/str"
 )
 
 var (
@@ -110,7 +110,7 @@ func serveIndex(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// serve default setting index.html
 		log.Printf("index.html does not exist in the current workspace, load default index HTML file")
-		byteHtml := stringp.ByteString(config.DefaultIndexHtml).SliceByte() // string to []byte
+		byteHtml := str.UnsafeString(config.DefaultIndexHtml).Bytes() // string to []byte
 		http.ServeContent(w, r, "index.html", time.Now(), bytes.NewReader(byteHtml))
 	}
 }
